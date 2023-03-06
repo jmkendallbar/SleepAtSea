@@ -4,9 +4,9 @@
 This directory contains:
 
 - ## [scripts](/scripts)
-  Here, we provide code required to reproduce analyses specific to this paper: 
+  Code required to reproduce analyses specific to this paper 
 - ## [data](/data)
-  Here, we provide the data required to reproduce figures & analyses specific to this paper.
+  Data required to reproduce figures & analyses specific to this paper
 
 ## Sharing/Access information
 
@@ -34,10 +34,12 @@ Please cite this compendium as:
 
   </details>
 
-  - ### **Step 00 - Speed Estimation:** `00_Speed-Estimation.m` - MATLAB code to estimate speed based on vertical speed + pitch, stroke rate, and body rotation. To be used in conjunction with the [CATS Toolbox](https://github.com/wgough/CATS-Methods-Materials) to create a dead-reckoned 3D track. 
+  - ### **Step 00 - Speed Estimation:** `00_Speed-Estimation.m` 
+    MATLAB code to estimate speed based on vertical speed + pitch, stroke rate, and body rotation. To be used in conjunction with the [CATS Toolbox](https://github.com/wgough/CATS-Methods-Materials) to create a dead-reckoned 3D track. 
     - **Input data:** 1Hz dataset with Depth (in meters), Pitch (in degrees), Roll (in degrees), and Stroke_Rate (in strokes per minute). `01_Hypnotrack_1Hz_ALL_ANIMALS.csv` (described below) is an example of an acceptable input data format.
     - **Output data:** 1Hz or interpolated 5Hz vector with speed estimate & plot to preview speed estimate output.
-  - ### **Step 01 - Sleep Spiral Analysis:** `01_SleepSpiralAnalysis.m` - Code to identify sleep spirals and generate summary statistics regarding the prevalence of Slow Wave Sleep (SWS) and Rapid-Eye-Movement (REM) sleep within sleep spirals.
+  - ### **Step 01 - Sleep Spiral Analysis:** `01_SleepSpiralAnalysis.m` 
+    Code to identify sleep spirals and generate summary statistics regarding the prevalence of Slow Wave Sleep (SWS) and Rapid-Eye-Movement (REM) sleep within sleep spirals.
     - ### Part A: Identify Sleep Spirals
         - **Input data:** 1Hz dataset with sleep state and motion data (x, y, z [Depth], pitch, roll, heading). `01_Hypnotrack_1Hz_ALL_ANIMALS.csv` (described below) contains an acceptable input format, but the column *is_SleepSpiral* is generated through this step and is not required as an input.
         - **Output data:** 1Hz dataset with binary designation *is_SleepSpiral* and other summary tables including a list of *Naps*, *Loops*, and *Spirals* and associated data.
@@ -68,7 +70,7 @@ Please cite this compendium as:
     - ### Part B: Connect data to animation: `04B_InputData-ForAnimation.py`
       Run this code using PyMel and Maya commands in the python Script Editor in Autodesk Maya to control the animation of a 3D rigged animal with this data.
   - ### **MATLAB Functions**
-        This repository uses a couple MATLAB functions, download the repo and add these to your path to allow MATLAB to reference these in the scripts above.
+      This repository uses a couple MATLAB functions, download the repo and add these to your path to allow MATLAB to reference these in the scripts above.
 
 
 - ## [data](/data)
