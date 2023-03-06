@@ -410,7 +410,7 @@ Please cite this compendium as:
 **Text and figures :**
 [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/) Please provide attribution (Jessica Kendall-Bar, 2023) when using our figures.
 
-**Code :** Please cite the Zenodo DOI provided above when using our code.
+**Code :** [MIT](https://choosealicense.com/licenses/mit/) Please cite the Zenodo DOI provided above when using our code.
 
 **Data :** [CC-0](http://creativecommons.org/publicdomain/zero/1.0/)
 attribution requested in reuse. Please cite the Dryad DOI provided above when using our code.
