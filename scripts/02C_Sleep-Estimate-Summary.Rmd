@@ -1,0 +1,252 @@
+---
+title: "Summarize Sleep Estimate Results"
+output: html_document
+author: "Jessica Kendall-Bar"
+---
+
+# SETUP
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(ggplot2)
+library("car")
+library("lubridate")
+library(here)
+library(tidyverse)
+library(lme4)
+library(reshape2)
+library(stringr)
+library(dplyr)
+library(sf)
+library(mapview)
+library(leaflet)
+library(RColorBrewer)
+
+calculate_mode <- function(x) {
+  uniqx <- unique(x)
+  uniqx[which.max(tabulate(match(x, uniqx)))]
+}
+```
+
+## Summarizing Restimates Model Output
+
+```{r Restimates_Summary}
+# Read data back in ----
+Daily_ALL <- read_csv(here("Data","02_01_SleepEstimates_ALL_DailyActivity.csv"))
+
+# Restimates_Metadata <- read_csv(here("Data","11_Sleep_Model_Summary.csv"),na='NaN')
+Restimates_Metadata <- read_csv(here("Data","02_00_AdultFemaleData_Metadata.csv"),na = c("NA","NaN", " "))
+Restimates_Metadata <- Restimates_Metadata %>% drop_na(TOPPID)
+
+# First, group by TOPPID, SEALID, and Season_Code to see how many same-season
+# deployments were done (used later in line 168).
+
+Daily_Budgets_ALL <- Daily_ALL %>% 
+  filter(daily_recording > 23.9 & daily_recording <24.1) %>% 
+  group_by(TOPPID) %>% 
+  dplyr::mutate(triprecord_days = max(Days_Elapsed)) %>% 
+  group_by(SEALID,Season_Code) %>% 
+  dplyr::mutate(deploys_per_seal = length(unique(TOPPID)))
+
+# Print out information on how many same-season deployments there were
+MinRepeatDeploymentSeals <- unique(Daily_Budgets_ALL$SEALID[Daily_Budgets_ALL$deploys_per_seal==min(Daily_Budgets_ALL$deploys_per_seal)])
+MaxRepeatDeploymentSeals <- unique(Daily_Budgets_ALL$SEALID[Daily_Budgets_ALL$deploys_per_seal==max(Daily_Budgets_ALL$deploys_per_seal)])
+paste("There were as many as",max(Daily_Budgets_ALL$deploys_per_seal), 
+      "same-season deployments on", length(MaxRepeatDeploymentSeals),"seals with IDs:")
+print(MaxRepeatDeploymentSeals)
+
+paste("There were as few as",min(Daily_Budgets_ALL$deploys_per_seal), 
+      "same-season deployments on", length(MinRepeatDeploymentSeals),"seals with IDs:")
+print(MinRepeatDeploymentSeals)
+
+length(unique(Daily_Budgets_ALL$TOPPID))
+
+# Pivot longer to have one observation per row - condensing all metrics for daily budgets into two columns - name & h_per_day
+Daily_Budgets_long <- Daily_Budgets_ALL %>% 
+  filter(daily_recording > 23.9 & daily_recording < 24.1) %>% # Must have at least 23.9 out of 24 h (excludes haulouts and days at the beginning and end of recording)
+  filter(Season_Code!="other") %>% 
+  pivot_longer(c('daily_recording','daily_diving','daily_long_SI',
+                 'daily_filtered_long_drift_long_SI',
+                 'daily_unfiltered_long_drift_long_SI',
+                 'dailydive_long_glide'), # THIS IS A SUBSET OF ALL AVAILABLE METRICS
+               names_to = "DailyActivity_label",
+               values_to = "h_per_day"
+  ) %>% 
+  select('TOPPID','SEALID','Season_Code','triprecord_days','deploys_per_seal', # Metadata
+         'unique_Days','Days_Elapsed','Percent_of_Trip', # Time-keeping
+         'DailyActivity_label','h_per_day', # Model output summary
+         'Lat','Long') 
+
+# Save data 
+write.csv(Daily_Budgets_long,here("Data","02_02_AdultFemaleData_DailySleepEstimates_long.csv"),row.names = FALSE)
+```
+
+## Create Summary Plots
+
+```{r Restimates_Grouping-Summary}
+# Group by individual, trip percent, to get 
+TripPercent_Summary <- Daily_Budgets_long %>% 
+  group_by(Season_Code,SEALID,Percent_of_Trip,DailyActivity_label) %>% # Group by SEALID (group )
+  dplyr::summarise(mean_h_per_trippercent = mean(h_per_day),
+                   sd_h_per_trippercent = sd(h_per_day))
+
+# Group by individual, trip percent, to get 
+TripPercent_Summary_eachseal <- Daily_Budgets_long %>% 
+  group_by(Season_Code,SEALID,DailyActivity_label) %>% # Group by SEALID (group )
+  dplyr::summarise(mean_h_per_seal = mean(h_per_day),
+                   sd_h_per_seal = sd(h_per_day))
+
+TripPercent_Summary_ALLSEALS <- Daily_Budgets_long %>% 
+  group_by(Season_Code,Percent_of_Trip,DailyActivity_label) %>% # Group by SEALID (group )
+  dplyr::summarise(mean_h_per_trippercent = mean(h_per_day),
+                   sd_h_per_trippercent = sd(h_per_day))
+ 
+Season_Summary <- Daily_Budgets_long %>% 
+  drop_na('h_per_day') %>% 
+  group_by(Season_Code,DailyActivity_label) %>% # Group by Season
+  dplyr::summarise(mean_h_per_day = mean(h_per_day),
+                   sd_h_per_day = sd(h_per_day),
+                   N_unique_seals = length(unique(SEALID)))
+
+Season_TripRecord_Summary <- Daily_Budgets_long %>% 
+  group_by(Season_Code) %>% # Group by Season
+  dplyr::summarise(mean_triprecord_days = mean(triprecord_days),
+                   sd_triprecord_days = sd(triprecord_days)) 
+
+Season_DaysSummary <- Daily_Budgets_ALL %>% 
+  group_by(Season_Code) %>% 
+  dplyr::summarise(total_sealdays = n())
+
+dailyactivity.col = c("Diving"= "#0c2c84",
+                      "Sleep Estimate" = "#41b6c4", 
+                      "Extended Surface Intervals" = "#FCBE46",
+                      "Recording"="#D7D7D7",
+                      "Long Drifts" = "#c7e9b4", 
+                      "Long Glides" = "#225ea8")
+
+Season_Summary$DailyActivity_label <- as.factor(Season_Summary$DailyActivity_label)
+TripPercent_Summary_eachseal$DailyActivity_label <- as.factor(TripPercent_Summary_eachseal$DailyActivity_label)
+
+levels(Season_Summary$DailyActivity_label) <- c("Diving", "Sleep Estimate", "Extended Surface Intervals","Recording","Long Drifts","Long Glides")
+levels(TripPercent_Summary_eachseal$DailyActivity_label) <- c("Diving", "Sleep Estimate", "Extended Surface Intervals","Recording","Long Drifts","Long Glides")
+
+Daily_Activity_Budget_plot <- ggplot()+
+  geom_hline(yintercept = 2, linetype='dashed',alpha=0.2)+
+  geom_col(data=Season_Summary, aes(x = reorder(DailyActivity_label, desc(mean_h_per_day)), 
+                                         y = mean_h_per_day, 
+                                         fill = reorder(DailyActivity_label, desc(mean_h_per_day))),
+           alpha=0.9)+
+  geom_jitter(data=TripPercent_Summary_eachseal, aes(x=reorder(DailyActivity_label, desc(mean_h_per_seal)),
+                                                     y=mean_h_per_seal) , alpha = 0.1)+
+  geom_text(data=Season_Summary,aes(x = reorder(DailyActivity_label, desc(mean_h_per_day)), 
+                                    y = mean_h_per_day+2.0, 
+                                    label = paste(round(mean_h_per_day,digits=1),"±",round(sd_h_per_day,digits=1))),
+            size=4, hjust=0.5)+
+  scale_fill_brewer(palette="YlGnBu", direction = -1)+
+  scale_color_brewer(palette="YlGnBu", direction = -1)+
+  facet_grid(cols=vars(Season_Code))+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x="Daily activity", y="Hours per day")+
+  theme_classic()+
+  theme(legend.position ='none')+
+  scale_y_continuous(breaks = c(0,2,4,6,8,10,12,14,16,18,20,22,24),limits = c(0,25))
+Daily_Activity_Budget_plot
+
+ggsave(here("Figures","11_Daily_Activity_Budget_barplot.png"),Daily_Activity_Budget_plot, width= 10,height = 8,units="in",dpi=300)
+ggsave(here("Figures","11_Daily_Activity_Budget_barplot.pdf"),Daily_Activity_Budget_plot, width= 10,height = 8,units="in",dpi=300)
+
+TripPercent_Summary_plot <- TripPercent_Summary_ALLSEALS
+
+TripPercent_Summary_plot$mean_h_per_trippercent[is.na(TripPercent_Summary_plot$mean_h_per_trippercent)] <- 0
+TripPercent_Summary_plot$sd_h_per_trippercent[is.na(TripPercent_Summary_plot$sd_h_per_trippercent)] <- 0
+
+levels(TripPercent_Summary_plot$DailyActivity_label) <- c("Recording","Diving","Long Drifts","Sleep Estimate","Extended Surface Intervals","Long Glides")
+
+stacked_area_Daily_Activity_plot <- ggplot()+
+  geom_area(data=TripPercent_Summary_plot, aes(x=Percent_of_Trip, 
+                                               y=mean_h_per_trippercent, 
+                                               fill=reorder(DailyActivity_label, desc(mean_h_per_trippercent))),position="identity")+
+  geom_hline(yintercept = 2, linetype='dashed',alpha=0.6)+
+  scale_fill_brewer(palette="YlGnBu", direction = -1)+
+  theme_classic()+
+  scale_y_continuous(breaks = c(0,2,4,6,8,10,12,14,16,18,20,22,24),limits = c(0,25))+
+  labs(x = "Percent of Trip (%)", y = "Hours per Day")+
+  facet_grid(rows=vars(Season_Code))+
+  labs(x="Percent of Trip (%)", y="Hours per day")+
+  theme(legend.position ='bottom')
+stacked_area_Daily_Activity_plot
+
+ggsave(here("Figures","11_Daily_Activity_Budget_stackedareaplot.png"),stacked_area_Daily_Activity_plot, width= 10,height = 6,units="in",dpi=300)
+ggsave(here("Figures","11_Daily_Activity_Budget_stackedareaplot.pdf"),stacked_area_Daily_Activity_plot, width= 10,height = 6,units="in",dpi=300)
+
+PM_days <- Season_DaysSummary$total_sealdays[Season_DaysSummary$Season_Code=="PM"]
+PB_days <- Season_DaysSummary$total_sealdays[Season_DaysSummary$Season_Code=="PB"]
+paste("Total Post-molt seal days recorded: ",PM_days)
+paste("Total Post-breeding seal days recorded: ",PB_days)
+paste("Total seal days recorded: ",PB_days + PM_days)
+
+PM_seals <- Season_Summary$N_unique_seals[Season_Summary$Season_Code=="PM" & Season_Summary$DailyActivity_label=="Sleep Estimate"]
+PB_seals <- Season_Summary$N_unique_seals[Season_Summary$Season_Code=="PB" & Season_Summary$DailyActivity_label=="Sleep Estimate"]
+
+PM_SR_seals <- Season_Summary$N_unique_seals[Season_Summary$Season_Code=="PM" & Season_Summary$DailyActivity_label=="Long Glides"]
+PB_SR_seals <- Season_Summary$N_unique_seals[Season_Summary$Season_Code=="PB" & Season_Summary$DailyActivity_label=="Long Glides"]
+
+PM_sleep <- Season_Summary$mean_h_per_day[Season_Summary$Season_Code=="PM" & Season_Summary$DailyActivity_label=="Sleep Estimate"]
+PB_sleep <- Season_Summary$mean_h_per_day[Season_Summary$Season_Code=="PB" & Season_Summary$DailyActivity_label=="Sleep Estimate"]
+PM_sleep_sd <- Season_Summary$sd_h_per_day[Season_Summary$Season_Code=="PM" & Season_Summary$DailyActivity_label=="Sleep Estimate"]
+PB_sleep_sd <- Season_Summary$sd_h_per_day[Season_Summary$Season_Code=="PB" & Season_Summary$DailyActivity_label=="Sleep Estimate"]
+
+paste("Total Seals recorded: ",PM_seals+PB_seals)
+paste("Total Stroke Rate Seals recorded (included in above): ",PB_SR_seals+PM_SR_seals)
+paste("Total PM seals: ",PM_seals, ". Total PB seals: ", PB_seals)
+paste("Average PM trip duration ", 
+      round(Season_TripRecord_Summary$mean_triprecord_days[Season_TripRecord_Summary$Season_Code=="PM"], digits=1), " +/- ",
+      round(Season_TripRecord_Summary$sd_triprecord_days[Season_TripRecord_Summary$Season_Code=="PM"], digits=1), " days.")
+paste("Average PB trip duration ", 
+      round(Season_TripRecord_Summary$mean_triprecord_days[Season_TripRecord_Summary$Season_Code=="PB"], digits=1), " +/- ",
+      round(Season_TripRecord_Summary$sd_triprecord_days[Season_TripRecord_Summary$Season_Code=="PB"], digits=1), " days.")
+
+paste("Average PM sleep estimate ", 
+      round(PM_sleep, digits=1), " +/- ", round(PM_sleep_sd, digits=1), " hours per day.")
+paste("Average PB sleep estimate ", 
+      round(PB_sleep, digits=1), " +/- ", round(PB_sleep_sd, digits=1), " hours per day.")
+
+```
+
+## Create Nap Maps
+
+```{r Plotting nap maps}
+
+Restimates_Metadata <- read_csv(here("Data","02_00_AdultFemaleData_Metadata.csv"),
+                                na = c("NA","NaN", " "))
+Restimates_Metadata <- Restimates_Metadata %>% drop_na(TOPPID)
+
+Goodtrack_metadata <- Restimates_Metadata %>% 
+  filter(`Track_QC`==1)
+
+Daily_ALL_goodtracks <- Daily_ALL[Daily_ALL$TOPPID %in% Goodtrack_metadata$TOPPID,]
+Daily_ALL_clean <- Daily_ALL_goodtracks %>% 
+  drop_na(Lat) %>% 
+  filter(daily_recording <24.1 & daily_recording >23.9)
+length(unique(Daily_ALL_clean$TOPPID))
+length(unique(Daily_ALL_clean$SEALID))
+
+write.csv(Daily_ALL_clean,here("Data","02_02_AdultFemaleData_DailySleepEstimates_wide_goodtracks.csv"),
+          row.names = FALSE)
+
+Daily_sf <- st_as_sf(Daily_ALL_clean, coords = c("Lon360", "Lat"),  crs = 4326)
+Daily_sf = st_shift_longitude(Daily_sf)
+
+Daily_sf_2anim <- Daily_sf %>% 
+  filter(TOPPID == 2011020 | TOPPID ==2011034)
+
+StarryNapMap <- mapview(Daily_sf_2anim, 
+        cex = "daily_filtered_long_drift_long_SI",
+        map.types = "Esri.WorldImagery", 
+        zcol = "daily_filtered_long_drift_long_SI",
+        col.regions = brewer.pal(9, "YlOrRd"),
+        col = "white",
+        layer.name = "Daily Sleep Estimate") 
+StarryNapMap
+```

@@ -1,0 +1,118 @@
+---
+title: "Compile Results"
+author: "Jessica Kendall-Bar"
+output: html_document
+---
+
+## SETUP 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(ggplot2)
+library("car")
+library("lubridate")
+library(here)
+library(tidyverse)
+library(lme4)
+library(reshape2)
+library(stringr)
+library(dplyr)
+
+calculate_mode <- function(x) {
+  uniqx <- unique(x)
+  uniqx[which.max(tabulate(match(x, uniqx)))]
+}
+```
+
+## Compiling Restimates Model Output File
+
+```{r Restimates_Output-to-Summary}
+rm(Daily)
+rm(SealsUsed)
+rm(Daily_ALL)
+rm(SealsUsed_ALL)
+
+SleepEstimatesFolder <- "11_Sleep-Estimates_Output/"
+Restimates_Filenames <- dir(here("Data",SleepEstimatesFolder))
+
+Restimates_split <- do.call(rbind, strsplit(Restimates_Filenames, "_"))[, 1:2]
+Restimates_Files <- data.frame(cbind(Restimates_Filenames, Restimates_split))
+colnames(Restimates_Files) <- c('Filename','TOPPID','SealID')
+Restimates_Files$FileID <- paste(Restimates_Files$TOPPID,"_",Restimates_Files$SealID,sep="")
+FileIDs <- unique(Restimates_Files$FileID)
+TOPPIDs <- unique(Restimates_Files$TOPPID)
+
+Restimates_Files$Dive_files <- str_extract(Restimates_Files$Filename, ".*Daily_Activity.csv")
+
+Daily_Files <- dir(here("Data",SleepEstimatesFolder),pattern=".*Daily_Activity.csv")
+
+Restimates_Metadata <- read_csv(here("Data","02_AdultFemaleData_Metadata.csv"),na = c("NA","NaN", " "))
+Restimates_Metadata <- Restimates_Metadata %>% drop_na(TOPPID)
+
+#
+for (i in 1:391) { 
+  
+  if (file.exists(paste(here("Data",SleepEstimatesFolder),"/",FileIDs[i],
+                        "_Daily_Activity.csv",sep=""))){
+    Daily <- read_csv(paste(here("Data",SleepEstimatesFolder),"/",FileIDs[i],
+                            "_Daily_Activity.csv",sep=""),
+                      na='NaN', show_col_types = FALSE)
+    SealsUsed <- read_csv(paste(here("Data",SleepEstimatesFolder),"/",FileIDs[i],
+                                "_Seals_Used.csv",sep=""),
+                      na='NaN', show_col_types = FALSE)
+
+    Daily$Percent_of_Trip <- round(100*(Daily$Days_Elapsed / max(Daily$Days_Elapsed)))
+    
+    Daily <- Daily %>% 
+      drop_na(Days_Elapsed) %>% 
+      mutate(across(everything(), as.character))
+    SealsUsed <- SealsUsed %>% 
+      drop_na(TOPPID) %>% 
+      mutate(across(everything(), as.character)) %>% 
+      mutate(as.numeric(TOPPID))
+    
+    if (SealsUsed$Season[1] == 1 | (SealsUsed$Trip_Duration[1] < 150 & SealsUsed$Trip_Duration[1] > 50)){
+      Daily$Season_Code = "PB"
+      SealsUsed$Season_Code = "PB"
+    }else if (SealsUsed$Season[1] == 2 | SealsUsed$Trip_Duration[1] > 150){
+      Daily$Season_Code = "PM"
+      SealsUsed$Season_Code = "PM"
+    }else {
+      Daily$Season_Code = "other"
+      SealsUsed$Season_Code = "other"
+    }
+  
+    QC <- Restimates_Metadata$`TDR_QC`[Restimates_Metadata$TOPPID==SealsUsed$TOPPID[1]]
+    if (is_empty(QC)){
+      Model_good <- 0
+    }else if(is.na(QC)) {
+      Model_good <- 0
+    }else if(QC == 1){
+      Model_good <-  1
+    }else {
+      Model_good <-  0
+    }
+    if (i==1 & Model_good){
+      # ONLY RUN FOR FIRST ANIMAL
+      Daily_ALL     <- Daily
+      SealsUsed_ALL <- SealsUsed
+    }
+    if (i>1 & Model_good){
+      #RUN FOR SUBSEQUENT ANIMALS
+      Daily_ALL <- dplyr::bind_rows(Daily_ALL, Daily)
+      SealsUsed_ALL <- dplyr::bind_rows(SealsUsed_ALL, SealsUsed)
+    }
+    }else{
+    next
+  }
+}
+
+# OMIT NANs before writing CSVs
+SealsUsed_ALL <- SealsUsed_ALL %>% 
+  drop_na(`Raw_Filenames`)
+
+write.csv(Daily_ALL,here("Data","02_01_SleepEstimates_ALL_DailyActivity.csv"),row.names = FALSE)
+write.csv(SealsUsed_ALL,here("Data","02_01_SleepEstimates_ALL_SealsUsed.csv"),row.names = FALSE)
+```
+
