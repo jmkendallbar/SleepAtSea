@@ -33,6 +33,7 @@ vignettes/*.pdf
 *_cache/
 /cache/
 data/*
+figures/*
 !data/README.md
 
 # Temporary files created by R markdown
