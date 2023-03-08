@@ -1,4 +1,5 @@
-# Sleep at Sea
+# SleepAtSea
+### Code for *Brain activity of diving seals reveals short sleep cycles at depth*
 ---
 
 This directory contains:
@@ -12,20 +13,24 @@ This directory contains:
 
 This repository contains the data and code for our paper:
 
-> Kendall-Bar, JM; Williams, TM; Mukherji, R; Lozano, DA; Pitman, JK; Holser, RR; Keates, T; Beltran, RS; Robinson, PW; Crocker, DE; Adachi, T; Lyamin, OI; Vyssotski, AL; Costa, DP (2023). *Brain activity of diving seals reveals short sleep cycles at depth*. Science.
-> <https://doi.org/xxx/xxx>
+> Kendall-Bar, JM; Williams, TM; Mukherji, R; Lozano, DA; Pitman, JK; Holser, RR; Keates, T; Beltran, RS; Robinson, PW; Crocker, DE; Adachi, T; Lyamin, OI; Vyssotski, AL; Costa, DP (2023). *Brain activity of diving seals reveals short sleep cycles at depth*. 
 
 ### How to cite
 
 Please cite this compendium as:
 
-> Kendall-Bar, JM; Williams, TM; Mukherji, R; Lozano, DA; Pitman, JK; Holser, RR; Keates, T; Beltran, RS; Robinson, PW; Crocker, DE; Adachi, T; Lyamin, OI; Vyssotski, AL; Costa, DP (2023). *Compendium of R code and data for Brain activity of diving seals reveals short sleep cycles at depth*. Accessed 24 Oct 2022. Online at
-> <https://doi.org/xxx/xxx>
+> Kendall-Bar, JM; Williams, TM; Mukherji, R; Lozano, DA; Pitman, JK; Holser, RR; Keates, T; Beltran, RS; Robinson, PW; Crocker, DE; Adachi, T; Lyamin, OI; Vyssotski, AL; Costa, DP (2023). *Code for "Brain activity of diving seals reveals short sleep cycles at depth"*. Accessed 24 Oct 2022. Online at
+> <https://doi.org/10.5281/zenodo.7702650>
+
+Find the data related to this compendium on Dryad and cite it as:
+
+> Kendall-Bar, JM; Williams, TM; Mukherji, R; Lozano, DA; Pitman, JK; Holser, RR; Keates, T; Beltran, RS; Robinson, PW; Crocker, DE; Adachi, T; Lyamin, OI; Vyssotski, AL; Costa, DP (2023). *Data for "Brain activity of diving seals reveals short sleep cycles at depth"*. Accessed 24 Oct 2022. Online at
+> <https://doi.org/10.7291/D1ZT2B>
 
 ## Contents
 
 - ## [scripts](/scripts)
-  Here, we provide code required to reproduce analyses specific to this paper: 
+  Here, we provide code required to reproduce analyses specific to this paper. Click here to access the versioned [Zenodo repository](https://doi.org/10.5281/zenodo.7702650).
   
   <details>
   <summary> Read more. </summary> 

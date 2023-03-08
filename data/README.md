@@ -1,17 +1,34 @@
 # Sleep at Sea
+
+### Data for *Brain activity of diving seals reveals short sleep cycles at depth*
 ---
 
 Find and download the data in this [Dryad repository](https://doi.org/10.7291/D1ZT2B).
 
+Cite it as:
+
+> Kendall-Bar, JM; Williams, TM; Mukherji, R; Lozano, DA; Pitman, JK; Holser, RR; Keates, T; Beltran, RS; Robinson, PW; Crocker, DE; Adachi, T; Lyamin, OI; Vyssotski, AL; Costa, DP (2023). *Data for "Brain activity of diving seals reveals short sleep cycles at depth"*. Accessed 24 Oct 2022. Online at
+> <https://doi.org/10.7291/D1ZT2B>
+
+Related software:
+
+> Kendall-Bar, JM; Williams, TM; Mukherji, R; Lozano, DA; Pitman, JK; Holser, RR; Keates, T; Beltran, RS; Robinson, PW; Crocker, DE; Adachi, T; Lyamin, OI; Vyssotski, AL; Costa, DP (2023). *Code for "Brain activity of diving seals reveals short sleep cycles at depth"*. Accessed 24 Oct 2022. Online at
+> <https://doi.org/10.5281/zenodo.7702650>
+
+This repository contains the data and code for our paper:
+
+> Kendall-Bar, JM; Williams, TM; Mukherji, R; Lozano, DA; Pitman, JK; Holser, RR; Keates, T; Beltran, RS; Robinson, PW; Crocker, DE; Adachi, T; Lyamin, OI; Vyssotski, AL; Costa, DP (2023). *Brain activity of diving seals reveals short sleep cycles at depth*. 
 
 - ## [data](/data)
   Data used in the analysis. Data can be downloaded from this [Dryad repository](https://doi.org/10.7291/D1ZT2B).
     - ## *00 Metadata and Summary Data files:*
-      - ### ***Results Summary*** - Wide-format table with metadata for EEG animals and summarizing all sleep data by location and sleep stage. 
+      - ### ***Results Summary*** 
+        Wide-format table with metadata for EEG animals and summarizing all sleep data by location and sleep stage. 
         This table shows calculations for Total Sleep Time with and without putative REM sleep. 
         `00_00_Sleep-Results-Summary-Table.xlsx`
 
-      - ### ***EEG Metadata*** - Wide-format table with EEG recording metadata.
+      - ### ***EEG Metadata*** 
+        Wide-format table with EEG recording metadata.
         `00_00_Sleep-Recording-Metadata.xlsx`
         <details>
         <summary> Column descriptions. </summary>
@@ -38,7 +55,8 @@ Find and download the data in this [Dryad repository](https://doi.org/10.7291/D1
         </details>
 
     - ## *01 Processed data files:*
-      - ### ***Hypnograms*** - Processed Sleep Scoring (lab, wild, & at sea)
+      - ### ***Hypnograms***
+        Processed Sleep Scoring (lab, wild, & at sea)
         `00_Hypnogram_30s_ALL_ANIMALS.csv` - Processed sleep scoring data for 30s epochs for all animals.
         <details>
         <summary> Column descriptions. </summary>
@@ -78,7 +96,8 @@ Find and download the data in this [Dryad repository](https://doi.org/10.7291/D1
           - **Day** - Day of the recording
         </details>
 
-      - ### ***Hypnotracks*** - Processed Sleep Scoring & Motion Data (3D tracks & Sleep State for seals at sea)
+      - ### ***Hypnotracks*** 
+        Processed Sleep Scoring & Motion Data (3D tracks & Sleep State for seals at sea)
         `01_Hypnotrack_1Hz_ALL_ANIMALS.csv` - Timeseries data at 1Hz showing sleep state and processed motion data.
         <details>
         <summary> Column descriptions. </summary>
@@ -139,7 +158,8 @@ Find and download the data in this [Dryad repository](https://doi.org/10.7291/D1
 
         </details>
       
-      - ### ***Hypnotrack Excerpt*** - 1Hz Excerpt from a sleep dive at sea (used in data visualization)
+      - ### ***Hypnotrack Excerpt*** 
+        1Hz Excerpt from a sleep dive at sea (used in data visualization)
         `01_02_AnimationExcerpt_Hypnotrack_1Hz.csv` - Timeseries data at 1Hz with x y z positions and sleep data.
         <details>
         <summary> Column descriptions. </summary>
@@ -197,7 +217,8 @@ Find and download the data in this [Dryad repository](https://doi.org/10.7291/D1
 
         </details>
 
-      - ### ***Higher-resolution Rotation and Swimming Data*** - 10Hz Excerpt from a sleep dive at sea (rotation and heart rate data for visualization)
+      - ### ***Higher-resolution Rotation and Swimming Data***    
+        10Hz Excerpt from a sleep dive at sea (rotation and heart rate data for visualization)
         `01_03_AnimationExcerpt_RotationSwim_10Hz.csv` - Timeseries data at 10Hz showing rotation and swimming behavior. Stroke rate and glide controller data were processed using the methods demonstrated in [Kendall-Bar et al. 2021](https://ieeexplore.ieee.org/document/9622956) through this [Github Wiki](https://github.com/jmkendallbar/VisualizingLifeintheDeep/blob/main/00_3D_00_StrokeData_to_Swim.md).  
         <details>
         <summary> Column descriptions. </summary>
@@ -217,7 +238,8 @@ Find and download the data in this [Dryad repository](https://doi.org/10.7291/D1
 
         </details>
 
-      - ### ***EEG/ECG Excerpt for a Sleep Dive*** - Processed Sleep Scoring & Motion Data (3D tracks & Sleep State for seals at sea)
+      - ### ***EEG/ECG Excerpt for a Sleep Dive*** 
+        Processed Sleep Scoring & Motion Data (3D tracks & Sleep State for seals at sea)
         `01_04_AnimationExcerpt_ECGEEGs_50Hz.csv` - Timeseries data at 50Hz with ECG, LEEG, and REEG during a sleeping dive.
         <details>
         <summary> Column descriptions. </summary>
@@ -229,7 +251,8 @@ Find and download the data in this [Dryad repository](https://doi.org/10.7291/D1
 
         </details>
 
-      - ### ***Time-depth Data for Sleep Estimation*** - Processed Data for Sleep Estimation Script
+      - ### ***Time-depth Data for Sleep Estimation***
+        Processed Data for Sleep Estimation Script
         `02_00_SLEEP_TOPPID_testNN_10_NewRaw.csv` - Timeseries data at 8 second intervals with sleep scoring information, geographic locations, and time-depth data.
         <details>
         <summary> Column descriptions. </summary>
