@@ -87,8 +87,10 @@ Find the data related to this compendium on Dryad and cite it as:
 
       - ### ***EEG Metadata*** - Wide-format table with EEG recording metadata.
         `00_00_Sleep-Recording-Metadata.xlsx`
+        
         <details>
         <summary> Column descriptions. </summary>
+
           - **Deployment** - Chronological EEG deployment sequence (1-13)
           - **TestNumber** - Recording ID number
           - **SealID** - Unique identifier for each seal
@@ -98,17 +100,20 @@ Find the data related to this compendium on Dryad and cite it as:
           - **OnAnimal_DateTime** - date & time logger was attached to animal (as detected by ECG)
           - **Duration_OnAnimal** - Duration of recording in hours (after OnAnimal_DateTime)
           - **ChannelConfiguration** - Vector of Channel #s for Raw EDF files that correspond to the vector of channel names: [LEOG REOG LEMG REMG LEEG1 REEG2 LEEG3 REEG4]
+
         </details>
 
       - ### ***Adult Female Metadata*** 
         `02_00_AdultFemaleData_Metadata.csv` - Metadata table for adult female deployments
         <details>
         <summary> Column descriptions. </summary>
+
           - **TOPPID** - Unique ID per deployment matching those in the TOPP database
           - **Year** - Year of start of deployment
           - **Season** - Season (Post-Breeding or Post-Molt)
           - **TDR_QC** - Binary to designate whether the time-depth record was of sufficient quality to run the sleep identification model.
           - **Track_QC** - Binary to designate whether the track was of sufficient quality (and length) to visualize spatial sleep results in summary figure
+          
         </details>
 
     - ## *01 Processed data files:*
