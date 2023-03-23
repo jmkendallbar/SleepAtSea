@@ -17,7 +17,8 @@ Related software:
 
 This repository contains the data and code for our paper:
 
-> Kendall-Bar, JM; Williams, TM; Mukherji, R; Lozano, DA; Pitman, JK; Holser, RR; Keates, T; Beltran, RS; Robinson, PW; Crocker, DE; Adachi, T; Lyamin, OI; Vyssotski, AL; Costa, DP (2023). *Brain activity of diving seals reveals short sleep cycles at depth*. 
+> Kendall-Bar, JM; Williams, TM; Mukherji, R; Lozano, DA; Pitman, JK; Holser, RR; Keates, T; Beltran, RS; Robinson, PW; Crocker, DE; Adachi, T; Lyamin, OI; Vyssotski, AL; Costa, DP (2023). *Brain activity of diving seals reveals short sleep cycles at depth*. Science. Online at
+> <https://www.science.org/doi/10.1126/science.adf0566>
 
 - ## [data](/data)
   Data used in the analysis. Data can be downloaded from this [Dryad repository](https://doi.org/10.7291/D1ZT2B).
