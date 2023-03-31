@@ -22,10 +22,13 @@ This repository contains the data and code for our paper:
 
 - ## [data](/data)
   Data used in the analysis. Data can be downloaded from this [Dryad repository](https://doi.org/10.7291/D1ZT2B).
+
+  *Missing values:* Missing values may be represented by `NA`, `NaN`, or `-` when data were not available. See `Column Description` dropdown menus for dataset-specific information.
+
     - ## *00 Metadata and Summary Data files:*
       - ### ***Results Summary*** 
         Wide-format table with metadata for EEG animals and summarizing all sleep data by location and sleep stage. 
-        This table shows calculations for Total Sleep Time with and without putative REM sleep. 
+        This table shows calculations for Total Sleep Time with and without putative REM sleep. Blank ('-' values) in this table designate that there are no data available for the given combination of SealID and recording location.
         `00_00_Sleep-Results-Summary-Table.xlsx`
 
       - ### ***EEG Metadata*** 
@@ -103,11 +106,13 @@ This repository contains the data and code for our paper:
 
       - ### ***Hypnotracks*** 
         Processed Sleep Scoring & Motion Data (3D tracks & Sleep State for seals at sea)
-        `01_Hypnotrack_1Hz_ALL_ANIMALS.csv` - Timeseries data at 1Hz showing sleep state and processed motion data.
+        `01_Hypnotrack_1Hz_ALL_ANIMALS.csv` - Timeseries data at 1Hz showing sleep state and processed motion data. 
         <details>
         <summary> Column descriptions. </summary>
           
-          *Note:* **Sleep_Num**, **Simple_Sleep_Num**, **Water_Num**, and **Resp_Num** redundantly code categorical/string data into numerical values for ease of analysis and plotting.
+          *Note:* **Sleep_Num**, **Simple_Sleep_Num**, **Water_Num**, and **Resp_Num** redundantly code categorical/string data into numerical values for ease of analysis and plotting. 
+          
+          *Missing values:* Missing values are represented by `NaN` (these appear at the beginning and end of recordings for statistics that rely on a data window [such as Heart Rate, Stroke Rate, and FFT Delta Spectral Power analysis]).
 
           - **Seconds** - Seconds elapsed for each recording
           - **R_Time** - Local time [PST] in R Format (YYYY-MM-DD HH:MM:SS)
@@ -249,6 +254,8 @@ This repository contains the data and code for our paper:
         <details>
         <summary> Column descriptions. </summary>
 
+          *Missing values:* Missing values are represented by `NaN` (inserted for skipped data sectors to maintain time alignment).
+
           - **Seconds** - Time in R format for the beginning of the 30s epoch
           - **ECG** - Electrocardiogram (ECG) data (in microVolts)
           - **LEEG** - Electroencephalogram (EEG) data (in microVolts)
@@ -262,6 +269,8 @@ This repository contains the data and code for our paper:
         <details>
         <summary> Column descriptions. </summary>
 
+          *Missing values:* Missing values are represented by `NaN` (these appear at the beginning and end of recordings for statistics that rely on a data window [such as Heart Rate, Stroke Rate, and FFT Delta Spectral Power analysis]).
+
           - **Columns same as Hypnotrack**
           Plus the required columns for this script:
           - **time** - Matlab date number for time 
@@ -273,6 +282,8 @@ This repository contains the data and code for our paper:
         `02_01_2011020_1015_Daily_Activity.csv` / `02_01_2011034_2036_Daily_Activity.csv` - Wide format observations of each day for two specific deployments. Activity labels are in individual columns (compared with long format above).
         <details>
         <summary> Column descriptions. </summary>
+
+        *Missing values:* Missing values are represented by `NaN` (these appear when stroke data were not available).
 
         - Columns:
           - **TOPPID** - unique identifier for each instrument deployment
@@ -293,7 +304,9 @@ This repository contains the data and code for our paper:
 
       - ### ***Compiled Sleep Estimate Data*** 
         Intermediate outputs with summarized data across seals
+        
         `02_01_SleepEstimates_ALL_SealsUsed.csv`
+        Metadata for all seals included in daily sleep analysis.
         <details>
         <summary> Column descriptions. </summary>
 
@@ -310,12 +323,37 @@ This repository contains the data and code for our paper:
           - **Season_Code** - Season designation (PB- post-breeding or PM- post molt)
 
         </details>
+        
+        `02_01_SleepEstimates_ALL_DailyActivity.csv` Data for each seal day.
+        <details>
+        <summary> Column descriptions. </summary>
+
+          *Missing values:* Missing values are represented by `NA` when data were not available.
+
+          Columns:
+          - **TOPPID** - unique identifier for each instrument deployment
+          - **SEALID** - unique identifier for each seal
+          - **unique_Days** - Matlab date number for the day of the observation
+          - **Days_Elapsed** - Number of days into the trip
+          - **Percent_of_Trip** - The percent of the trip that has elapsed 
+          - ***Daily_recording*** - number of recording hours per day (should be 24 or close to it) 
+          - ***Daily_diving*** - number of diving hours per day (time spent below 2 m)
+          - ***Daily_long_SI*** - number of hours in an extended surface interval (at surface for > 10 min)
+          - ***Daily_filtered_long_drift_long_SI*** - number of hours of estimated sleep (includes potential sleep while drifting, on the ocean floor, and in extended surface intervals)
+          - ***Dailydive_long_glide*** - number of hours spent in an extended glide (to be roughly compared to estimated sleep (Daily_filtered_long_drift_long_SI)).
+          - **Lat** - Latitude in decimal degrees
+          - **Long** - Longitude in decimal degrees
+          - **Lon360** - Longitude in decimal degrees from 0 to 360 (no negative values)
+
+        </details>
 
 
       - ### ***Adult Female Sleep Estimate Data***
         `02_01_AdultFemaleData_DailySleepEstimates_long.csv` - Long format observations of hours per day performing different activities for Sleep Estimate analysis for all animals. Observations for the same seal (across multiple deployments) were later grouped and averaged for each trip percentile to compare individuals. Activity labels are in column `DailyActivity_label` and values are in column `h_per_day`.
         <details>
         <summary> Column descriptions. </summary>
+
+        *Missing values:* Missing values are represented by `NA` when data were not available.
 
         - Columns:
           - **TOPPID** - unique identifier for each instrument deployment
@@ -340,6 +378,8 @@ This repository contains the data and code for our paper:
         `02_02_AdultFemaleData_DailySleepEstimates_wide_goodtracks.csv` - Wide format observations of each day for deployments with tracks of sufficient quality to be included in geospatial sleep analysis. Activity labels are now in individual columns (compared with long format above).
         <details>
         <summary> Column descriptions. </summary>
+
+        *Missing values:* Missing values are represented by `NA` when data were not available.
 
         - Columns:
           - **TOPPID** - unique identifier for each instrument deployment
