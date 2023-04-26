@@ -83,7 +83,7 @@ DailyData <- read_csv(here("data","02_02_AdultFemaleData_DailySleepEstimates_wid
 num_unique <- length(unique(DailyData$SEALID))
 
 tracks <- ggplot(DailyData) +
-  geom_path(aes(x = Lon360, y = Lat, group = TOPPID),
+  geom_path(aes(x = Lon360, y = Lat),
             size = 1, color="lightblue", alpha = 0.05) +
   xlab("Longitude") +
   ylab("Latitude") +
@@ -99,7 +99,7 @@ DailyData_subset <- DailyData %>%
   filter(TOPPID == 2011020 | TOPPID ==2011034)
 
 tracks_subset <- ggplot(DailyData_subset) +
-  geom_path(aes(x = Lon360, y = Lat, group = TOPPID),
+  geom_path(aes(x = Lon360, y = Lat),
             size = 1, color="lightblue", alpha = 1) + # use lower opacity for multiple tracks
   xlab("Longitude") +
   ylab("Latitude") +
