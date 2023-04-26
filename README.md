@@ -70,7 +70,10 @@ Find the data related to this compendium on Dryad and cite it as:
       - **Output data:** Two CSVs used to create maps in the paper:
         - `02_02_AdultFemaleData_DailySleepEstimates_long.csv`
         - `02_02_AdultFemaleData_DailySleepEstimates_wide_goodtracks.csv`
-  - ### **Step 04 - Visualization**
+  - ### **Step 03 - 2D Visualization**
+    - ### Visualize data using R: `03_R-Data-Animations.Rmd`
+      Run the R markdown file in RStudio to remake some of the figures and animations in this [short data-driven animation video](https://twitter.com/jmkendallbar/status/1649111889199366146).
+  - ### **Step 04 - 3D Visualization**
     - ### Part A: Connect swim & glide attributes: `04A_swim_and_glide.py`
       Follow the steps outlined in [this tutorial](https://github.com/jmkendallbar/VisualizingLifeintheDeep/blob/main/00_3D_00_StrokeData_to_Swim.md) to animate a swim cycle and connect those animated keyframes to these swim and glide attributes.
     - ### Part B: Connect data to animation: `04B_InputData-ForAnimation.py`
