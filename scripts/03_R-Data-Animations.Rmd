@@ -145,6 +145,13 @@ StarryNapMap <- mapview(DailyData_sf,
         layer.name = "Daily Sleep Estimate") # name the legend
 
 StarryNapMap
+
+mapshot(StarryNapMap,
+  url = NULL,
+  file = here("Figures","StarryNapMap.pdf"),
+  remove_controls = c("zoomControl", "layersControl", "homeButton", "scaleBar",
+    "drawToolbar", "easyButton")
+)
 ```
 
 ```{r}
