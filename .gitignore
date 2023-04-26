@@ -35,6 +35,10 @@ vignettes/*.pdf
 data/*
 figures/*
 !data/README.md
+!data/02_02_AdultFemaleData_DailySleepEstimates_wide_goodtracks.csv
+!data/02_00_SLEEP_2021044_test33_10_NewRaw.csv
+!data/01_03_AnimationExcerpt_RotationSwim_10Hz.csv
+!data/01_02_AnimationExcerpt_Hypnotrack_1Hz.csv
 
 # Temporary files created by R markdown
 *.utf8.md
