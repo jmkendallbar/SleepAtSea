@@ -19,6 +19,8 @@ library(plotly) # a plotting library that has some interactive capacity!
 library(sf) # a library for geospatial data analysis
 library(mapview) # a geospatial plotting library for interactive maps
 library(RColorBrewer) # a library with nice, accessible color palettes
+library(rnaturalearth) # a library with basemaps for ggplot
+library(rnaturalearthdata) # a library with basemap data for ggplot 
 
 ```
 
@@ -41,7 +43,7 @@ Data <- read_csv(here("data",filename))
 # based on the data in Sleep_Num where values 4 and above represent sleep.
 Data$is_sleep <- ifelse(Data$Sleep_Num >= 4, 1, 0)
 # Subsetting data to only include values within a certain time range (in seconds)
-Data_subset <- subset(Data, Seconds >= 1 * 86400 & Seconds < 2 * 86400)
+Data_subset <- subset(Data, Seconds >= 1 * 86400 & Seconds < 1.1 * 86400)
 
 # Plotting depth versus time for that subset of data
 Depthvtime <- ggplot(Data_subset) +
@@ -130,11 +132,12 @@ animate(tracks_subset + transition_reveal(DailyData_subset$Days_Elapsed),
 anim_save(here("figures",paste("Tracks_animated.gif", sep="")),
           bg = "transparent")
 ```
+
 ```{r}
 
 # For geospatial data, you may not be able to plot your data on a cartesian coordinate system, you may need a specific geospatial projection. This code turns your data into a geospatial "sf" object that stores lat & long for geospatial plotting
 
-DailyData_sf <- st_as_sf(DailyData_subset, coords = c("Lon360", "Lat"), crs = 4326)
+DailyData_sf <- st_as_sf(DailyData_subset, coords = c("Long", "Lat"), crs = 4326)
 
 StarryNapMap <- mapview(DailyData_sf, 
         cex = "daily_filtered_long_drift_long_SI",# scale dot size with sleep estimate 
@@ -152,6 +155,34 @@ mapshot(StarryNapMap,
   remove_controls = c("zoomControl", "layersControl", "homeButton", "scaleBar",
     "drawToolbar", "easyButton")
 )
+
+```
+```{r}
+# Plotting using this new sf object (and coord_sf) as opposed to coord_quickmap
+
+# import world map dataset
+world_map <- ne_countries(scale = "medium", returnclass = "sf")
+
+# Get the extent of DailyData_sf
+bb <- st_bbox(DailyData_sf)
+
+# Create the ggplot object with DailyData_sf and basemap_sf
+tracks_sf <- ggplot() +
+                # Add the basemap
+                geom_sf(data = world_map, fill = "beige", color = "lightgrey") +
+                # Add the DailyData points
+                geom_sf(data = DailyData_sf, size = 1, color="lightblue", 
+                        alpha = 1) +
+                # Set the map extent to the extent of DailyData_sf
+                coord_sf(xlim = c(bb["xmin"], bb["xmax"]), 
+                         ylim = c(bb["ymin"], bb["ymax"]), expand = FALSE) +
+                # Add labels and title
+                xlab("Longitude") +
+                ylab("Latitude") +
+                ggtitle(paste("Tracking data for adult female seals, N =",num_unique)) +
+                theme(panel.background = element_blank(), panel.grid = element_blank(),
+                      plot.background = element_blank())
+tracks_sf
 ```
 
 ```{r}
@@ -169,15 +200,20 @@ simple.sleep.col = c("Unscorable"="#D7D7D7",
 plot_ly(SleepingDive, x = ~x, y = ~y, z = ~z, 
         color = ~Simple_Sleep_Code, 
         colors = simple.sleep.col,
+        size = 10,
+        type = "scatter3d", mode = "markers")
+```
+```{r}
+# 3D plot of elephant seal sleeping dive using plotly
+
+plot_ly(SleepingDive, x = ~x, y = ~y, z = ~z, 
+        color = ~roll,
+        size = 10,
         type = "scatter3d", mode = "markers")
 ```
 
 ```{r}
-# 3D plot of elephant seal sleeping dive (on PC's you can use another package called rgl that works better)
-SleepingDive <- read_csv(here("data","01_02_AnimationExcerpt_Hypnotrack_1Hz.csv"))
-
-simple.sleep.col = c("Unscorable"="#D7D7D7", "Active Waking"= "#0c2c84","Quiet Waking" = "#225ea8",
-                     "Drowsiness"="#BBA9CF","REM" = "#FCBE46", "SWS" = "#41b6c4")
+# Static 3D plot (not interactive) of elephant seal sleeping dive
 
 splot3d <- scatterplot3d(SleepingDive$x, 
               SleepingDive$y, 
