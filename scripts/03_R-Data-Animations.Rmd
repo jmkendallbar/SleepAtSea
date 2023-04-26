@@ -1,0 +1,145 @@
+---
+title: "R-Data_Animations"
+author: "Jessica Kendall-Bar"
+date: "2023-04-25"
+output: html_document
+---
+
+## SETUP - loading required packages
+
+```{r setup, include=FALSE}
+# Loading all the packages you'll need to make these plots
+
+library(tidyverse) # a package for loading and manipulating data
+library(ggplot2) # a package for making plots (ggplots)
+library(gganimate) # a package for animating ggplots
+library(here) # a package for locating files relative to an .Rproj file
+library(scatterplot3d) # a package for creating 3D scatterplots
+library(plotly) # a plotting library that has some interactive capacity!
+
+```
+
+## Load in data
+
+```{r cars}
+TOPPID <- "2021044"
+SEALID <- "test33"
+filename <- paste("02_00_SLEEP_",TOPPID,"_",SEALID,"_10_NewRaw.csv",sep="")
+
+Data <- read_csv(here("data",filename))
+```
+
+## Plotting depth versus time for a single northern elephant seal adult female for animation
+
+```{r pressure, echo=FALSE}
+# Plot depth vs. time
+
+# Making a new column that encodes whether the animal is asleep (1) or not (0) 
+# based on the data in Sleep_Num where values 4 and above represent sleep.
+Data$is_sleep <- ifelse(Data$Sleep_Num >= 4, 1, 0)
+# Subsetting data to only include values within a certain time range (in seconds)
+Data_subset <- subset(Data, Seconds >= 1 * 86400 & Seconds < 2 * 86400)
+
+# Plotting depth versus time for that subset of data
+Depthvtime <- ggplot(Data_subset) +
+  # the next few lines add data to your plot
+  geom_line(aes(x = Seconds, y = CorrectedDepth),
+            color = 'blue', alpha = 0.5) + # this adds a line graph with depth v time
+  geom_area(aes(x=Seconds, y=(CorrectedDepth*is_sleep)),
+            fill = 'yellow', alpha = 0.5) + # this adds an area plot highlighting sleep
+  scale_alpha(range = c(0.1, 1))+
+  # the next few lines add labels and define your axis conventions
+  xlab("Time") + # add an x-axis label
+  ylab("Depth") + # add a y-axis label
+  ggtitle(paste("Depth vs. Time for",TOPPID,SEALID))+ # add a title
+  scale_y_continuous(trans = "reverse",breaks = seq(0, 1000, 100))+ # define y axis label breaks
+  # the next few lines help make your exported plot simple and transparent
+  theme(panel.background = element_blank(), # get rid of all the background elements
+        panel.grid = element_blank(), # get rid of all the grid elements
+        plot.background = element_blank()) # get rid of all the plot elements 
+
+Depthvtime
+
+# Export plot as png with transparent background
+ggsave(plot=Depthvtime, 
+       here("figures","Depthvtime.png"), 
+       bg = "transparent",limitsize=FALSE,
+       width=10,
+       height=4)
+
+# Export plot as png with transparent background
+ggsave(plot=Depthvtime, 
+       here("figures","Depthvtime.pdf"), 
+       bg = "transparent",limitsize=FALSE,
+       width=10,
+       height=4)
+```
+
+## This code plots the tracks of all female northern elephant seals from our study
+
+```{r}
+
+DailyData <- read_csv(here("data","02_02_AdultFemaleData_DailySleepEstimates_wide_goodtracks.csv"))
+num_unique <- length(unique(DailyData$SEALID))
+
+tracks <- ggplot(DailyData) +
+  geom_path(aes(x = Lon360, y = Lat, group = TOPPID),
+            size = 1, color="lightblue", alpha = 0.05) +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle(paste("Tracking data for adult female elephant seals N =",num_unique))+
+  coord_quickmap()+
+  theme(panel.background = element_blank(),
+        panel.grid = element_blank(),
+        plot.background = element_blank())
+
+tracks
+
+# Export plot as png with transparent background
+ggsave(plot=tracks, 
+       here("figures","tracks.pdf"), 
+       bg = "transparent",limitsize=FALSE,
+       width=10,
+       height=4)
+```
+
+## Use this next chunk when your computer has some time :) This will generate and save your animation
+
+```{r} 
+animate(tracks + transition_reveal(DailyData$Days_Elapsed),
+        duration=30,fps = 24, width = 1920, height = 1080, bg = 'transparent')
+anim_save(here("figures",paste("Tracks_animated.gif", sep="")),
+          bg = "transparent")
+```
+
+```{r}
+# 3D plot of elephant seal sleeping dive using plotly
+
+SleepingDive <- read_csv(here("data","01_02_AnimationExcerpt_Hypnotrack_1Hz.csv"))
+
+simple.sleep.col = c("Unscorable"="#D7D7D7", 
+                     "Active Waking"= "#0c2c84",
+                     "Quiet Waking" = "#225ea8",
+                     "Drowsiness"="#BBA9CF",
+                     "REM" = "#FCBE46", 
+                     "SWS" = "#41b6c4")
+
+plot_ly(SleepingDive, x = ~x, y = ~y, z = ~z, 
+        color = ~Simple_Sleep_Code, 
+        colors = simple.sleep.col,
+        type = "scatter3d", mode = "markers")
+```
+
+```{r}
+# 3D plot of elephant seal sleeping dive (on PC's you can use another package called rgl that works better)
+SleepingDive <- read_csv(here("data","01_02_AnimationExcerpt_Hypnotrack_1Hz.csv"))
+
+simple.sleep.col = c("Unscorable"="#D7D7D7", "Active Waking"= "#0c2c84","Quiet Waking" = "#225ea8",
+                     "Drowsiness"="#BBA9CF","REM" = "#FCBE46", "SWS" = "#41b6c4")
+
+splot3d <- scatterplot3d(SleepingDive$x, 
+              SleepingDive$y, 
+              SleepingDive$z,
+              color = simple.sleep.col[SleepingDive$Simple_Sleep_Code], 
+              type = "p", main = "3D plot of sleeping dives")
+```
