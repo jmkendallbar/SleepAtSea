@@ -16,6 +16,9 @@ library(gganimate) # a package for animating ggplots
 library(here) # a package for locating files relative to an .Rproj file
 library(scatterplot3d) # a package for creating 3D scatterplots
 library(plotly) # a plotting library that has some interactive capacity!
+library(sf) # a library for geospatial data analysis
+library(mapview) # a geospatial plotting library for interactive maps
+library(RColorBrewer) # a library with nice, accessible color palettes
 
 ```
 
@@ -126,6 +129,22 @@ animate(tracks_subset + transition_reveal(DailyData_subset$Days_Elapsed),
         duration=30,fps = 24, width = 1920, height = 1080, bg = 'transparent')
 anim_save(here("figures",paste("Tracks_animated.gif", sep="")),
           bg = "transparent")
+```
+```{r}
+
+# For geospatial data, you may not be able to plot your data on a cartesian coordinate system, you may need a specific geospatial projection. This code turns your data into a geospatial "sf" object that stores lat & long for geospatial plotting
+
+DailyData_sf <- st_as_sf(DailyData_subset, coords = c("Lon360", "Lat"), crs = 4326)
+
+StarryNapMap <- mapview(DailyData_sf, 
+        cex = "daily_filtered_long_drift_long_SI",# scale dot size with sleep estimate 
+        map.types = "Esri.WorldImagery", # use Esri World Imagery basemap 
+        zcol = "daily_filtered_long_drift_long_SI", # color according to sleep estimate
+        col.regions = brewer.pal(9, "YlOrRd"), # use color brewer palette YlOrRd
+        col = "white", # outline dots with white
+        layer.name = "Daily Sleep Estimate") # name the legend
+
+StarryNapMap
 ```
 
 ```{r}
