@@ -95,6 +95,22 @@ tracks <- ggplot(DailyData) +
 
 tracks
 
+DailyData_subset <- DailyData %>% 
+  filter(TOPPID == 2011020 | TOPPID ==2011034)
+
+tracks_subset <- ggplot(DailyData_subset) +
+  geom_path(aes(x = Lon360, y = Lat, group = TOPPID),
+            size = 1, color="lightblue", alpha = 1) + # use lower opacity for multiple tracks
+  xlab("Longitude") +
+  ylab("Latitude") +
+  ggtitle(paste("Tracking data for adult female elephant seals N =",num_unique))+
+  coord_quickmap()+
+  theme(panel.background = element_blank(),
+        panel.grid = element_blank(),
+        plot.background = element_blank())
+
+tracks_subset
+
 # Export plot as png with transparent background
 ggsave(plot=tracks, 
        here("figures","tracks.pdf"), 
@@ -106,7 +122,7 @@ ggsave(plot=tracks,
 ## Use this next chunk when your computer has some time :) This will generate and save your animation
 
 ```{r} 
-animate(tracks + transition_reveal(DailyData$Days_Elapsed),
+animate(tracks_subset + transition_reveal(DailyData_subset$Days_Elapsed),
         duration=30,fps = 24, width = 1920, height = 1080, bg = 'transparent')
 anim_save(here("figures",paste("Tracks_animated.gif", sep="")),
           bg = "transparent")
