@@ -400,7 +400,7 @@ This repository contains the data and code for our paper:
 
     - ## *Raw data files:*
       - ### ***EEG Raw Data***
-        - Raw EEG, EMG, EOG, and motion sensor data for all deployments, labeled by *TestNumber* (see `00_Sleep-Recording-Metadata.xlsx` for related metadata including start times and channel configuration details).
+        - Raw EEG, EMG, EOG, and motion sensor data for all deployments, labeled by *TestNumber* (see `00_Sleep-Recording-Metadata.xlsx` for related metadata including start times and channel configuration details). Channel configuration vectors correspond to channels in the raw EDF files, converted directly from the binary .dat files saved on the Neurologger. The channels are numbered in the following order: [1:ECG 2:LEOG 3:REOG 4:LEMG 5:REMG 6:LEEG1 7:REEG2 8:LEEG3 9:REEG4].
 
 ----
 
