@@ -20,6 +20,8 @@ library(sf) # a library for geospatial data analysis
 library(mapview) # a geospatial plotting library for interactive maps
 library(RColorBrewer) # a library with nice, accessible color palettes
 library(rnaturalearth) # a library with basemaps for ggplot
+library(terra)
+library(raster)
 library(rnaturalearthdata) # a library with basemap data for ggplot 
 
 ```
